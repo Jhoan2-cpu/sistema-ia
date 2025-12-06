@@ -13,7 +13,8 @@ CORS(app)
 
 # Configure Gemini AI
 genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
-model = genai.GenerativeModel('gemini-pro')
+# Use Gemini 2.5 Flash - stable and fast model
+model = genai.GenerativeModel('models/gemini-2.5-flash')
 
 @app.route('/')
 def index():
