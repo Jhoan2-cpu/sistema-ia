@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema IA de Comunicación</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="icon">🎓</span>
+                    <h1>Sistema IA de Comunicación</h1>
+                </div>
+                <div class="powered-by">
+                    Powered by Gemini AI <span class="status-dot"></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h2>Herramientas de Inteligencia Artificial</h2>
+            <p class="subtitle">Mejora tus habilidades de comunicación con nuestras herramientas impulsadas por IA.<br>
+            Genera contenido, evalúa respuestas y recibe retroalimentación personalizada.</p>
+        </section>
+
+        <section class="tools-grid">
+            <!-- Generador de Quiz -->
+            <div class="tool-card" onclick="openModal('quizModal')">
+                <div class="tool-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <span>❓</span>
+                </div>
+                <div class="arrow">→</div>
+                <h3>Generador de Quiz</h3>
+                <p>Crea cuestionarios personalizados con diferentes tipos de preguntas y evalúa respuestas automáticamente.</p>
+                <div class="tool-feature">
+                    <span class="feature-icon">🎯</span>
+                    <span>1-20 preguntas</span>
+                </div>
+            </div>
+
+            <!-- Generador de Resúmenes -->
+            <div class="tool-card" onclick="openModal('summaryModal')">
+                <div class="tool-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <span>📄</span>
+                </div>
+                <div class="arrow">→</div>
+                <h3>Generador de Resúmenes</h3>
+                <p>Crea resúmenes efectivos de textos largos con opciones de exportación en PDF y Word.</p>
+                <div class="tool-feature">
+                    <span class="feature-icon">📥</span>
+                    <span>Exportable PDF/Word</span>
+                </div>
+            </div>
+
+            <!-- Generador de Informes -->
+            <div class="tool-card" onclick="openModal('reportModal')">
+                <div class="tool-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <span>📊</span>
+                </div>
+                <div class="arrow">→</div>
+                <h3>Generador de Informes</h3>
+                <p>Genera informes detallados y personalizados con análisis profesional y exportación.</p>
+                <div class="tool-feature">
+                    <span class="feature-icon">📁</span>
+                    <span>Informes profesionales</span>
+                </div>
+            </div>
+
+            <!-- Sistema de Retroalimentación -->
+            <div class="tool-card" onclick="openModal('feedbackModal')">
+                <div class="tool-icon" style="background: linear-gradient(135deg, #fdeb71 0%, #f8d800 100%);">
+                    <span>💬</span>
+                </div>
+                <div class="arrow">→</div>
+                <h3>Sistema de Retroalimentación</h3>
+                <p>Recibe comentarios constructivos y evaluaciones detalladas de tus respuestas.</p>
+                <div class="tool-feature">
+                    <span class="feature-icon">⭐</span>
+                    <span>Comentarios inmediatos</span>
+                </div>
+            </div>
+
+            <!-- Recomendaciones -->
+            <div class="tool-card" onclick="openModal('recommendationsModal')">
+                <div class="tool-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                    <span>💡</span>
+                </div>
+                <div class="arrow">→</div>
+                <h3>Recomendaciones</h3>
+                <p>Obtén recursos personalizados según tu nivel y dificultades específicas.</p>
+                <div class="tool-feature">
+                    <span class="feature-icon">✓</span>
+                    <span>Personalizado</span>
+                </div>
+            </div>
+
+            <!-- Evaluación de Quiz -->
+            <div class="tool-card" onclick="openModal('evaluationModal')">
+                <div class="tool-icon" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                    <span>📋</span>
+                </div>
+                <div class="arrow">→</div>
+                <h3>Evaluación de Quiz</h3>
+                <p>Completa cuestionarios y recibe evaluaciones automáticas con puntajes detallados.</p>
+                <div class="tool-feature">
+                    <span class="feature-icon">%</span>
+                    <span>Puntaje automático</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal: Generador de Quiz -->
+    <div id="quizModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Generador de Quiz</h2>
+                <span class="close" onclick="closeModal('quizModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Tema del Quiz</label>
+                    <input type="text" id="quizTopic" placeholder="Ej: Comprensión lectora" value="Comprensión lectora">
+                </div>
+                <div class="form-group">
+                    <label>Cantidad de Preguntas</label>
+                    <input type="range" id="quizQuestions" min="1" max="20" value="5" oninput="updateQuizCount(this.value)">
+                    <div class="range-labels">
+                        <span>1</span>
+                        <span id="quizQuestionCount" class="range-value">5</span>
+                        <span>20</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="generateQuiz()" id="generateQuizBtn">
+                    <span class="btn-icon">✨</span> Generar Quiz
+                </button>
+                <div id="quizResult" class="result-container" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Generador de Resúmenes -->
+    <div id="summaryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Generador de Resúmenes</h2>
+                <span class="close" onclick="closeModal('summaryModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Texto para Resumir</label>
+                    <textarea id="summaryText" rows="8" placeholder="Ingresa el texto que deseas resumir (mínimo 100 caracteres)...">La comunicación es el proceso mediante el cual las personas intercambian información, ideas, emociones y conocimientos a través de un sistema común de símbolos, signos o comportamientos. Este proceso puede ser verbal, cuando se utilizan palabras habladas o escritas, o no verbal, cuando intervienen gestos, expresiones faciales, lenguaje corporal, tono de voz y otros elementos que complementan o incluso sustituyen el mensaje. La comunicación es fundamental en la vida social, educativa y laboral, ya que permite coordinar acciones, resolver conflictos, construir relaciones y transmitir cultura. Además, no es un proceso lineal, sino interactivo: requiere de un emisor que codifica y transmite el mensaje, un receptor que lo interpreta y un contexto que influye en su significado. Una comunicación efectiva depende no solo de la claridad del mensaje, sino también de la capacidad de escuchar, empatizar y adaptarse a las circunstancias y necesidades de la otra parte.</textarea>
+                    <div class="char-count"><span id="summaryCharCount">970</span> caracteres</div>
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Resumen</label>
+                    <select id="summaryType">
+                        <option value="academic">Resumen Académico</option>
+                        <option value="executive">Resumen Ejecutivo</option>
+                        <option value="simple">Resumen Simple</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="generateSummary()" id="generateSummaryBtn">
+                    <span class="btn-icon">📄</span> Generar Resumen
+                </button>
+                <div id="summaryResult" class="result-container" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Generador de Informes -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Generador de Informes</h2>
+                <span class="close" onclick="closeModal('reportModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Tema del Informe</label>
+                    <input type="text" id="reportTopic" placeholder="Ej: Análisis literario" value="Análisis literario">
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Informe</label>
+                    <select id="reportType">
+                        <option value="textual">Análisis Textual</option>
+                        <option value="comparative">Análisis Comparativo</option>
+                        <option value="critical">Análisis Crítico</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Descripción y Objetivos</label>
+                    <textarea id="reportDescription" rows="3" placeholder="Describe lo que deseas en el informe...">El informe lo quiero detallado</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Datos/Fuentes (Opcional)</label>
+                    <textarea id="reportData" rows="3" placeholder="Incluye datos históricos, fuentes o referencias...">Incluye datos históricos sobre la literatura</textarea>
+                </div>
+                <button class="btn btn-primary" onclick="generateReport()" id="generateReportBtn">
+                    <span class="btn-icon">📊</span> Generar Informe
+                </button>
+                <div id="reportResult" class="result-container" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Sistema de Retroalimentación -->
+    <div id="feedbackModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Sistema de Retroalimentación</h2>
+                <span class="close" onclick="closeModal('feedbackModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p class="info-text">Ingresa tus respuestas para recibir retroalimentación personalizada</p>
+                <div id="feedbackAnswers">
+                    <div class="form-group">
+                        <label>Pregunta 1: ¿Cuál es la importancia de la comunicación efectiva?</label>
+                        <textarea class="feedback-answer" rows="3" placeholder="Tu respuesta..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Pregunta 2: Describe los elementos del proceso comunicativo</label>
+                        <textarea class="feedback-answer" rows="3" placeholder="Tu respuesta..."></textarea>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" onclick="addFeedbackQuestion()">+ Agregar pregunta</button>
+                <button class="btn btn-primary" onclick="generateFeedback()" id="generateFeedbackBtn">
+                    <span class="btn-icon">💬</span> Obtener Retroalimentación
+                </button>
+                <div id="feedbackResult" class="result-container" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Recomendaciones -->
+    <div id="recommendationsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Recomendaciones Personalizadas</h2>
+                <span class="close" onclick="closeModal('recommendationsModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Tu Nivel</label>
+                    <select id="userLevel">
+                        <option value="beginner">Principiante</option>
+                        <option value="intermediate" selected>Intermedio</option>
+                        <option value="advanced">Avanzado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Dificultades Específicas</label>
+                    <textarea id="userDifficulties" rows="3" placeholder="Describe tus dificultades o áreas que te cuestan...">Tengo dificultad con la redacción de ensayos académicos</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Intereses (Opcional)</label>
+                    <textarea id="userInterests" rows="2" placeholder="¿Qué temas te interesan más?...">Literatura contemporánea y análisis de medios</textarea>
+                </div>
+                <button class="btn btn-primary" onclick="generateRecommendations()" id="generateRecommendationsBtn">
+                    <span class="btn-icon">💡</span> Obtener Recomendaciones
+                </button>
+                <div id="recommendationsResult" class="result-container" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Evaluación de Quiz -->
+    <div id="evaluationModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2>Evaluación de Quiz</h2>
+                <span class="close" onclick="closeModal('evaluationModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="info-box">
+                    <h4>Instrucciones</h4>
+                    <p>Responde las siguientes preguntas y recibe una evaluación automática con puntaje y comentarios detallados.</p>
+                </div>
+                <div id="evaluationQuestions">
+                    <div class="question-card">
+                        <h4>1. ¿Cuál es la idea principal del siguiente párrafo?</h4>
+                        <p class="question-context">"La comunicación efectiva no solo implica transmitir información, sino también asegurarse de que el mensaje sea comprendido correctamente por el receptor. Esto requiere considerar el contexto, el público objetivo y los medios más apropiados para cada situación."</p>
+                        <div class="options">
+                            <label class="option">
+                                <input type="radio" name="q1" value="A">
+                                <span>La información debe ser transmitida rápidamente</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q1" value="B">
+                                <span>La comunicación efectiva requiere comprensión y adaptación al contexto</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q1" value="C">
+                                <span>El receptor debe adaptarse al emisor</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="question-card">
+                        <h4>2. Escribe un párrafo explicando la importancia de la retroalimentación en el proceso comunicativo.</h4>
+                        <textarea class="eval-answer" rows="4" placeholder="Escribe tu respuesta aquí..."></textarea>
+                    </div>
+
+                    <div class="question-card">
+                        <h4>3. Verdadero o Falso: La comunicación no verbal representa más del 50% del mensaje total.</h4>
+                        <div class="options">
+                            <label class="option">
+                                <input type="radio" name="q3" value="true">
+                                <span>Verdadero</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q3" value="false">
+                                <span>Falso</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="evaluateQuiz()" id="evaluateQuizBtn">
+                    <span class="btn-icon">📋</span> Evaluar Quiz
+                </button>
+                <div id="evaluationResult" class="result-container" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Sistema IA de Comunicación. Powered by Gemini AI.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
