@@ -421,6 +421,37 @@ input[type="range"]::-moz-range-thumb {
     to { transform: translateY(-50%) rotate(360deg); }
 }
 
+/* Feedback Item Container */
+.feedback-item-container {
+    background: white;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.feedback-item-container:hover {
+    border-color: var(--primary-color);
+}
+
+.feedback-question,
+.feedback-answer {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color 0.3s;
+}
+
+.feedback-question:focus,
+.feedback-answer:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
 /* Result Container */
 .result-container {
     margin-top: 2rem;

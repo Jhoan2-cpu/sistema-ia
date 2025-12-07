@@ -219,20 +219,22 @@
                 <span class="close" onclick="closeModal('feedbackModal')">&times;</span>
             </div>
             <div class="modal-body">
-                <p class="info-text">Ingresa tus respuestas para recibir retroalimentación personalizada</p>
+                <p class="info-text">Ingresa preguntas y respuestas para recibir retroalimentación personalizada</p>
                 <div id="feedbackAnswers">
-                    <div class="form-group">
-                        <label>Pregunta 1: ¿Cuál es la importancia de la comunicación efectiva?</label>
-                        <textarea class="feedback-answer" rows="3" placeholder="Tu respuesta..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Pregunta 2: Describe los elementos del proceso comunicativo</label>
-                        <textarea class="feedback-answer" rows="3" placeholder="Tu respuesta..."></textarea>
+                    <div class="feedback-item-container">
+                        <div class="form-group">
+                            <label>Pregunta</label>
+                            <textarea class="feedback-question" rows="2" placeholder="Ingresa la pregunta que fue respondida...">¿Cuál es la importancia de la comunicación efectiva?</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Respuesta del Estudiante</label>
+                            <textarea class="feedback-answer" rows="3" placeholder="Ingresa la respuesta que necesita ser evaluada..."></textarea>
+                        </div>
                     </div>
                 </div>
                 <button class="btn btn-secondary" onclick="addFeedbackQuestion()">+ Agregar pregunta</button>
                 <button class="btn btn-primary" onclick="generateFeedback()" id="generateFeedbackBtn">
-                    <span class="btn-icon">💬</span> Obtener Retroalimentación
+                    <span class="btn-icon">💬</span> Generar Retroalimentación
                 </button>
                 <div id="feedbackResult" class="result-container" style="display:none;"></div>
             </div>

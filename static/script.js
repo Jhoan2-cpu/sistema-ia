@@ -272,37 +272,50 @@ function downloadReport(format) {
 }
 
 // Sistema de Retroalimentación
-let feedbackQuestionCount = 2;
+let feedbackQuestionCount = 1;
 
 function addFeedbackQuestion() {
     feedbackQuestionCount++;
     const container = document.getElementById('feedbackAnswers');
 
-    const questionDiv = document.createElement('div');
-    questionDiv.className = 'form-group';
-    questionDiv.innerHTML = `
-        <label>Pregunta ${feedbackQuestionCount}: Tu pregunta personalizada</label>
-        <textarea class="feedback-answer" rows="3" placeholder="Tu respuesta..."></textarea>
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'feedback-item-container';
+    itemDiv.innerHTML = `
+        <div class="form-group">
+            <label>Pregunta</label>
+            <textarea class="feedback-question" rows="2" placeholder="Ingresa la pregunta que fue respondida..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>Respuesta del Estudiante</label>
+            <textarea class="feedback-answer" rows="3" placeholder="Ingresa la respuesta que necesita ser evaluada..."></textarea>
+        </div>
     `;
 
-    container.appendChild(questionDiv);
+    container.appendChild(itemDiv);
 }
 
 async function generateFeedback() {
-    const answerElements = document.querySelectorAll('.feedback-answer');
+    const containers = document.querySelectorAll('.feedback-item-container');
     const answers = [];
 
-    answerElements.forEach((el, index) => {
-        if (el.value.trim()) {
+    containers.forEach((container, index) => {
+        const questionEl = container.querySelector('.feedback-question');
+        const answerEl = container.querySelector('.feedback-answer');
+
+        const question = questionEl ? questionEl.value.trim() : '';
+        const answer = answerEl ? answerEl.value.trim() : '';
+
+        if (question && answer) {
             answers.push({
                 question_number: index + 1,
-                answer: el.value.trim()
+                question: question,
+                answer: answer
             });
         }
     });
 
     if (answers.length === 0) {
-        alert('Por favor ingresa al menos una respuesta');
+        alert('Por favor ingresa al menos una pregunta y su respuesta');
         return;
     }
 
