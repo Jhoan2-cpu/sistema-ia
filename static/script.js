@@ -95,13 +95,20 @@ function downloadQuiz(format) {
     if (!data) return;
 
     const content = data.formattedText;
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `quiz_${data.quiz.topic}_${new Date().toISOString().split('T')[0]}.${format === 'pdf' ? 'txt' : 'txt'}`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const fileName = `quiz_${data.quiz.topic}_${new Date().toISOString().split('T')[0]}`;
+
+    if (format === 'pdf') {
+        generatePDF(content, fileName);
+    } else {
+        // Download as TXT
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${fileName}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
 }
 
 // Generador de Resúmenes
@@ -170,13 +177,19 @@ function displaySummaryResult(data) {
 function downloadSummary(format) {
     if (!window.currentSummary) return;
 
-    const blob = new Blob([window.currentSummary], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `resumen_${new Date().toISOString().split('T')[0]}.${format === 'pdf' ? 'txt' : 'txt'}`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const fileName = `resumen_${new Date().toISOString().split('T')[0]}`;
+
+    if (format === 'pdf') {
+        generatePDF(window.currentSummary, fileName);
+    } else {
+        const blob = new Blob([window.currentSummary], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${fileName}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
 }
 
 // Generador de Informes
@@ -243,13 +256,19 @@ function displayReportResult(data) {
 function downloadReport(format) {
     if (!window.currentReport) return;
 
-    const blob = new Blob([window.currentReport], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `informe_${new Date().toISOString().split('T')[0]}.${format === 'pdf' ? 'txt' : 'txt'}`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const fileName = `informe_${new Date().toISOString().split('T')[0]}`;
+
+    if (format === 'pdf') {
+        generatePDF(window.currentReport, fileName);
+    } else {
+        const blob = new Blob([window.currentReport], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${fileName}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
 }
 
 // Sistema de Retroalimentación
@@ -622,7 +641,113 @@ function formatMarkdown(text) {
     return html;
 }
 
+// Generate PDF function
+function generatePDF(content, fileName) {
+    console.log('generatePDF llamado con:', fileName);
+
+    // Verificar que jsPDF esté disponible
+    if (!window.jspdf) {
+        console.error('jsPDF no está cargado');
+        alert('Error: La biblioteca de PDF no está cargada. Descargando como TXT...');
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${fileName}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+        return;
+    }
+
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        console.log('jsPDF inicializado correctamente');
+
+        // Configuración
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 20;
+        const maxWidth = pageWidth - (margin * 2);
+        let yPosition = margin;
+
+        // Título
+        doc.setFontSize(18);
+        doc.setFont(undefined, 'bold');
+        doc.text('Sistema IA de Comunicación', margin, yPosition);
+        yPosition += 10;
+
+        // Fecha
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.text(`Fecha: ${new Date().toLocaleDateString('es-ES')}`, margin, yPosition);
+        yPosition += 15;
+
+        // Línea separadora
+        doc.setLineWidth(0.5);
+        doc.line(margin, yPosition, pageWidth - margin, yPosition);
+        yPosition += 10;
+
+        // Contenido - limpiar markdown básico
+        let cleanContent = content
+            .replace(/\*\*/g, '')  // Remove bold markers
+            .replace(/\*/g, '')    // Remove italic markers
+            .replace(/###/g, '')   // Remove h3
+            .replace(/##/g, '')    // Remove h2
+            .replace(/#/g, '');    // Remove h1
+
+        // Split content into lines
+        doc.setFontSize(11);
+        const lines = doc.splitTextToSize(cleanContent, maxWidth);
+
+        // Add lines to PDF with page break support
+        for (let i = 0; i < lines.length; i++) {
+            if (yPosition > pageHeight - margin) {
+                doc.addPage();
+                yPosition = margin;
+            }
+            doc.text(lines[i], margin, yPosition);
+            yPosition += 7;
+        }
+
+        // Footer
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(150);
+            doc.text(
+                `Página ${i} de ${totalPages}`,
+                pageWidth / 2,
+                pageHeight - 10,
+                { align: 'center' }
+            );
+            doc.text(
+                'Powered by Gemini AI',
+                pageWidth - margin,
+                pageHeight - 10,
+                { align: 'right' }
+            );
+        }
+
+        // Save PDF
+        doc.save(`${fileName}.pdf`);
+    } catch (error) {
+        console.error('Error generando PDF:', error);
+        alert('Error al generar PDF. Descargando como TXT en su lugar...');
+        // Fallback to TXT
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${fileName}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Sistema IA de Comunicación inicializado');
+    console.log('Sistema IA de Comunicación inicializado - v1.1');
+    console.log('jsPDF disponible:', !!window.jspdf);
 });
