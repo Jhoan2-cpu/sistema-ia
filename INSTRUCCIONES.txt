@@ -1,0 +1,98 @@
+================================================================================
+           SISTEMA IA DE COMUNICACIÓN - INSTRUCCIONES DE INSTALACIÓN
+================================================================================
+
+REQUISITOS: Python 3.11+ instalado y conexión a Internet
+
+--------------------------------------------------------------------------------
+PASO 1: DESCOMPRIMIR
+--------------------------------------------------------------------------------
+Extrae el ZIP en una carpeta. Ejemplo: C:\sistema-ia
+
+
+--------------------------------------------------------------------------------
+PASO 2: ABRIR TERMINAL
+--------------------------------------------------------------------------------
+Click derecho en la carpeta → "Abrir en Terminal"
+O navega con CMD: cd C:\ruta\a\sistema-ia
+
+
+--------------------------------------------------------------------------------
+PASO 3: CREAR ENTORNO VIRTUAL
+--------------------------------------------------------------------------------
+python -m venv venv
+
+
+--------------------------------------------------------------------------------
+PASO 4: ACTIVAR ENTORNO VIRTUAL
+--------------------------------------------------------------------------------
+Windows (CMD):       venv\Scripts\activate
+Windows (PowerShell): venv\Scripts\Activate.ps1
+Mac/Linux:           source venv/bin/activate
+
+Verás "(venv)" al inicio de la línea cuando esté activo.
+
+
+--------------------------------------------------------------------------------
+PASO 5: INSTALAR DEPENDENCIAS
+--------------------------------------------------------------------------------
+pip install -r requirements.txt
+
+Espera 1-2 minutos mientras se instalan.
+
+
+--------------------------------------------------------------------------------
+PASO 6: EJECUTAR LA APLICACIÓN
+--------------------------------------------------------------------------------
+python app.py
+
+Verás: * Running on http://127.0.0.1:5000
+
+
+--------------------------------------------------------------------------------
+PASO 7: ABRIR EN NAVEGADOR
+--------------------------------------------------------------------------------
+Ve a: http://localhost:5000
+
+
+--------------------------------------------------------------------------------
+LAS 6 HERRAMIENTAS DISPONIBLES
+--------------------------------------------------------------------------------
+1. Generador de Quiz - Crea cuestionarios personalizados
+2. Generador de Resúmenes - Resume textos largos
+3. Generador de Informes - Crea informes académicos
+4. Sistema de Retroalimentación - Evalúa respuestas
+5. Recomendaciones - Recursos personalizados
+6. Evaluación de Quiz - Califica quizzes
+
+
+--------------------------------------------------------------------------------
+SOLUCIÓN DE PROBLEMAS
+--------------------------------------------------------------------------------
+Python no reconocido:
+  → Instala desde python.org (marca "Add Python to PATH")
+
+No se activa el entorno (PowerShell):
+  → Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+Error al instalar:
+  → python -m pip install --upgrade pip
+  → pip install -r requirements.txt
+
+Página no carga:
+  → Verifica que app.py esté corriendo
+  → Intenta http://127.0.0.1:5000
+
+Puerto en uso:
+  → Cambia PORT en archivo .env
+
+
+--------------------------------------------------------------------------------
+NOTAS
+--------------------------------------------------------------------------------
+- La API key de Gemini ya está configurada en el archivo .env
+- Requiere Internet para funcionar
+- PDFs se generan en el navegador
+- Puerto por defecto: 5000
+
+================================================================================

@@ -184,10 +184,10 @@ Para cada respuesta proporciona:
 1. Evaluación de la respuesta (correcta, parcialmente correcta, incorrecta)
 2. Comentarios constructivos específicos
 3. Sugerencias de mejora
-4. Puntuación (0-100)
+4. Puntuación (0-20, donde 20 es excelente)
 
 Luego proporciona:
-- Puntuación total
+- Puntuación total sobre 20
 - Fortalezas generales
 - Áreas de mejora
 - Recomendaciones personalizadas
@@ -198,13 +198,13 @@ Devuelve el resultado en formato JSON:
         {{
             "question_number": 1,
             "evaluation": "correcta|parcial|incorrecta",
-            "score": 0-100,
+            "score": 0-20,
             "comments": "comentarios específicos",
             "suggestions": "sugerencias"
         }}
     ],
     "overall": {{
-        "total_score": 0-100,
+        "total_score": 0-20,
         "strengths": ["fortaleza 1", "fortaleza 2"],
         "areas_to_improve": ["área 1", "área 2"],
         "recommendations": ["recomendación 1", "recomendación 2"]
@@ -298,6 +298,52 @@ Devuelve el resultado en formato JSON:
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/api/generate-quiz-question', methods=['POST'])
+def generate_quiz_question():
+    """Genera una nueva pregunta de quiz de comunicación"""
+    try:
+        data = request.json
+        existing_questions = data.get('existing_questions', [])
+
+        prompt = f"""Genera UNA ÚNICA pregunta de nivel universitario sobre Comunicación.
+
+La pregunta debe ser diferente a estas que ya existen:
+{json.dumps(existing_questions, indent=2, ensure_ascii=False)}
+
+Tipos de pregunta disponibles:
+- Opción múltiple (con 4 opciones)
+- Respuesta abierta
+- Verdadero/Falso
+
+Devuelve el resultado en formato JSON:
+{{
+    "type": "multiple_choice|open_ended|true_false",
+    "question": "texto de la pregunta",
+    "options": ["opción 1", "opción 2", "opción 3", "opción 4"],
+    "correct_answer": "respuesta correcta",
+    "context": "contexto o párrafo si es necesario (opcional)"
+}}
+
+Asegúrate de que sea una pregunta completamente diferente y no similar a las existentes."""
+
+        response = model.generate_content(prompt)
+        result_text = response.text
+
+        # Extract JSON from markdown code blocks if present
+        json_match = re.search(r'```(?:json)?\s*(.*?)\s*```', result_text, re.DOTALL)
+        if json_match:
+            result_text = json_match.group(1)
+
+        question_data = json.loads(result_text)
+
+        return jsonify({
+            'success': True,
+            'question': question_data
+        })
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/api/evaluate-quiz', methods=['POST'])
 def evaluate_quiz():
     """Evalúa un quiz completado y proporciona puntuación detallada"""
@@ -318,9 +364,9 @@ RESPUESTAS DEL USUARIO:
 {json.dumps(user_answers, indent=2, ensure_ascii=False)}
 
 Evalúa cada respuesta y proporciona:
-1. Puntuación por pregunta
+1. Puntuación por pregunta (sobre 20 puntos total dividido entre el número de preguntas)
 2. Feedback específico
-3. Puntuación total
+3. Puntuación total sobre 20
 4. Nivel de desempeño
 
 Devuelve el resultado en formato JSON:
@@ -329,13 +375,13 @@ Devuelve el resultado en formato JSON:
         {{
             "question_number": 1,
             "correct": true|false,
-            "score": 0-100,
+            "score": puntos obtenidos,
             "feedback": "feedback específico",
             "correct_answer": "respuesta correcta"
         }}
     ],
     "summary": {{
-        "total_score": 0-100,
+        "total_score": 0-20,
         "correct_count": 0,
         "total_questions": 0,
         "performance_level": "excelente|bueno|regular|necesita mejorar",

@@ -357,10 +357,10 @@ function displayFeedbackResult(feedback) {
 
     // Individual feedback
     feedback.individual_feedback?.forEach(item => {
-        const scoreClass = item.score >= 80 ? 'excellent' : item.score >= 60 ? 'good' : 'needs-improvement';
+        const scoreClass = item.score >= 16 ? 'excellent' : item.score >= 12 ? 'good' : 'needs-improvement';
         html += `
             <div class="feedback-item">
-                <div class="feedback-score ${scoreClass}">Pregunta ${item.question_number}: ${item.score}/100</div>
+                <div class="feedback-score ${scoreClass}">Pregunta ${item.question_number}: ${item.score}/20</div>
                 <p><strong>Evaluación:</strong> ${item.evaluation}</p>
                 <p><strong>Comentarios:</strong> ${item.comments}</p>
                 <p><strong>Sugerencias:</strong> ${item.suggestions}</p>
@@ -374,7 +374,7 @@ function displayFeedbackResult(feedback) {
         html += `
             <div class="feedback-item" style="border-left: 4px solid var(--success-color); margin-top: 1.5rem;">
                 <h4>Resumen General</h4>
-                <div class="feedback-score excellent">Puntuación Total: ${overall.total_score}/100</div>
+                <div class="feedback-score excellent">Puntuación Total: ${overall.total_score}/20</div>
                 <p><strong>Fortalezas:</strong></p>
                 <ul>
                     ${overall.strengths?.map(s => `<li>${s}</li>`).join('') || ''}
@@ -501,50 +501,148 @@ function displayRecommendationsResult(recommendations) {
     resultDiv.innerHTML = html;
 }
 
+// Evaluación de Quiz - Variables globales
+let quizQuestions = [
+    {
+        number: 1,
+        type: "multiple_choice",
+        question: "¿Cuál es la idea principal del siguiente párrafo?",
+        context: "La comunicación efectiva no solo implica transmitir información, sino también asegurarse de que el mensaje sea comprendido correctamente por el receptor. Esto requiere considerar el contexto, el público objetivo y los medios más apropiados para cada situación.",
+        options: [
+            "La información debe ser transmitida rápidamente",
+            "La comunicación efectiva requiere comprensión y adaptación al contexto",
+            "El receptor debe adaptarse al emisor"
+        ],
+        correct_answer: "B"
+    },
+    {
+        number: 2,
+        type: "open_ended",
+        question: "Escribe un párrafo explicando la importancia de la retroalimentación en el proceso comunicativo."
+    },
+    {
+        number: 3,
+        type: "true_false",
+        question: "Verdadero o Falso: La comunicación no verbal representa más del 50% del mensaje total.",
+        correct_answer: "true"
+    }
+];
+
+let questionCounter = 3;
+
+// Agregar pregunta dinámica con IA
+async function addQuizQuestion() {
+    const btn = event.target;
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Generando pregunta...';
+
+    try {
+        // Extraer solo las preguntas para evitar duplicados
+        const existingQuestions = quizQuestions.map(q => q.question);
+
+        const response = await fetch(`${API_BASE}/api/generate-quiz-question`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ existing_questions: existingQuestions })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            questionCounter++;
+            const newQuestion = {
+                number: questionCounter,
+                ...data.question
+            };
+
+            quizQuestions.push(newQuestion);
+            renderQuizQuestion(newQuestion);
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        alert('Error al generar pregunta: ' + error.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '+ Agregar Pregunta con IA';
+    }
+}
+
+// Renderizar una pregunta en el DOM
+function renderQuizQuestion(q) {
+    const container = document.getElementById('evaluationQuestions');
+    const questionCard = document.createElement('div');
+    questionCard.className = 'question-card';
+    questionCard.dataset.questionNumber = q.number;
+
+    let html = `<h4>${q.number}. ${q.question}</h4>`;
+
+    if (q.context) {
+        html += `<p class="question-context">"${q.context}"</p>`;
+    }
+
+    if (q.type === 'multiple_choice') {
+        html += '<div class="options">';
+        q.options.forEach((option, index) => {
+            const letter = String.fromCharCode(65 + index);
+            html += `
+                <label class="option">
+                    <input type="radio" name="q${q.number}" value="${letter}">
+                    <span>${option}</span>
+                </label>
+            `;
+        });
+        html += '</div>';
+    } else if (q.type === 'open_ended') {
+        html += `<textarea class="eval-answer" data-question="${q.number}" rows="4" placeholder="Escribe tu respuesta aquí..."></textarea>`;
+    } else if (q.type === 'true_false') {
+        html += `
+            <div class="options">
+                <label class="option">
+                    <input type="radio" name="q${q.number}" value="true">
+                    <span>Verdadero</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q${q.number}" value="false">
+                    <span>Falso</span>
+                </label>
+            </div>
+        `;
+    }
+
+    questionCard.innerHTML = html;
+    container.appendChild(questionCard);
+}
+
 // Evaluación de Quiz
 async function evaluateQuiz() {
     const quiz = {
         topic: "Comunicación",
-        questions: [
-            {
-                number: 1,
-                type: "multiple_choice",
-                question: "¿Cuál es la idea principal del siguiente párrafo?",
-                correct_answer: "B"
-            },
-            {
-                number: 2,
-                type: "open_ended",
-                question: "Escribe un párrafo explicando la importancia de la retroalimentación en el proceso comunicativo."
-            },
-            {
-                number: 3,
-                type: "true_false",
-                question: "Verdadero o Falso: La comunicación no verbal representa más del 50% del mensaje total.",
-                correct_answer: "true"
-            }
-        ]
+        questions: quizQuestions
     };
 
     const userAnswers = [];
 
-    // Get Q1 answer
-    const q1Answer = document.querySelector('input[name="q1"]:checked');
-    if (q1Answer) {
-        userAnswers.push({ question_number: 1, answer: q1Answer.value });
-    }
-
-    // Get Q2 answer
-    const q2Answer = document.querySelectorAll('.eval-answer')[0]?.value;
-    if (q2Answer?.trim()) {
-        userAnswers.push({ question_number: 2, answer: q2Answer.trim() });
-    }
-
-    // Get Q3 answer
-    const q3Answer = document.querySelector('input[name="q3"]:checked');
-    if (q3Answer) {
-        userAnswers.push({ question_number: 3, answer: q3Answer.value });
-    }
+    // Recopilar todas las respuestas dinámicamente
+    quizQuestions.forEach(q => {
+        if (q.type === 'multiple_choice' || q.type === 'true_false') {
+            const answer = document.querySelector(`input[name="q${q.number}"]:checked`);
+            if (answer) {
+                userAnswers.push({
+                    question_number: q.number,
+                    answer: answer.value
+                });
+            }
+        } else if (q.type === 'open_ended') {
+            const answer = document.querySelector(`textarea[data-question="${q.number}"]`);
+            if (answer && answer.value.trim()) {
+                userAnswers.push({
+                    question_number: q.number,
+                    answer: answer.value.trim()
+                });
+            }
+        }
+    });
 
     if (userAnswers.length === 0) {
         alert('Por favor responde al menos una pregunta');
@@ -590,11 +688,11 @@ function displayEvaluationResult(evaluation) {
     // Summary
     if (evaluation.summary) {
         const summary = evaluation.summary;
-        const scoreClass = summary.total_score >= 80 ? 'excellent' : summary.total_score >= 60 ? 'good' : 'needs-improvement';
+        const scoreClass = summary.total_score >= 16 ? 'excellent' : summary.total_score >= 12 ? 'good' : 'needs-improvement';
 
         html += `
             <div class="feedback-item" style="border-left: 4px solid var(--success-color);">
-                <div class="feedback-score ${scoreClass}">Puntuación Total: ${summary.total_score}/100</div>
+                <div class="feedback-score ${scoreClass}">Puntuación Total: ${summary.total_score}/20</div>
                 <p><strong>Respuestas correctas:</strong> ${summary.correct_count} de ${summary.total_questions}</p>
                 <p><strong>Nivel de desempeño:</strong> ${summary.performance_level}</p>
                 <p><strong>Comentario general:</strong> ${summary.general_feedback}</p>
@@ -606,12 +704,12 @@ function displayEvaluationResult(evaluation) {
     if (evaluation.evaluations?.length > 0) {
         html += '<h4 style="margin-top: 1.5rem;">Evaluación por Pregunta</h4>';
         evaluation.evaluations.forEach(item => {
-            const scoreClass = item.score >= 80 ? 'excellent' : item.score >= 60 ? 'good' : 'needs-improvement';
+            const scoreClass = item.score >= 16 ? 'excellent' : item.score >= 12 ? 'good' : 'needs-improvement';
             const statusIcon = item.correct ? '✓' : '✗';
 
             html += `
                 <div class="feedback-item">
-                    <div class="feedback-score ${scoreClass}">${statusIcon} Pregunta ${item.question_number}: ${item.score}/100</div>
+                    <div class="feedback-score ${scoreClass}">${statusIcon} Pregunta ${item.question_number}: ${item.score}/20</div>
                     <p><strong>Feedback:</strong> ${item.feedback}</p>
                     ${!item.correct ? `<p><strong>Respuesta correcta:</strong> ${item.correct_answer}</p>` : ''}
                 </div>
